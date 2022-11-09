@@ -1,0 +1,62 @@
+how to upload an image in folder-->
+-create spring boot project,spring web dependency
+
+-create an interface "FileService" with mthd name upload image
+
+-In application.properties use-->
+
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=10MB
+project.image=images/ 
+
+-Implement FileService method using class "FileServiceImpl"
+
+//implementing file service method
+public String uploadImage(String path, MultipartFile file) {
+		//File name
+		String name=file.getOriginalFilename();
+		
+		//random name generate of file
+		String randomID=UUID.randomUUID().toString();
+    String fileName1=randomID.concat(name.substring(name.lastIndexOf(".")));
+		
+  //Full path
+    String filePath=path+File.separator+ fileName1;
+    
+		//create folder if not created
+		File f=new File(path);
+		if(!f.exists()) {
+			f.mkdir();
+		}
+		//file copy
+		
+		try {
+			Files.copy(file.getInputStream(), Paths.get(filePath));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return name;
+	}
+
+
+
+----Now create Filecontroller and create method for uploading the files.
+@PostMapping("/upload")
+	public ResponseEntity<FileResponse> fileUpload(@RequestParam("image")MultipartFile image){
+	
+		String fileName=null;
+		
+		try {
+			fileName=this.fileService.uploadImage(path, image);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(new FileResponse(null,"Image is not uploaded due to error on server!!"),HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+	return new ResponseEntity<>(new FileResponse(fileName,"Image is Successfully uploaded!!"),HttpStatus.OK);
+		
+	}
+--create class fileResponse with two variables(filename,message)
