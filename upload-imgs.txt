@@ -60,3 +60,8 @@ public String uploadImage(String path, MultipartFile file) {
 		
 	}
 --create class fileResponse with two variables(filename,message)
+
+
+how to run on postman
+post-->url ,now go to response body value="image" ,type=file,select file
+
